@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Accounting Equation Quiz (CheckMate)</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    font-size: 10pt;
+    background: #f9f7f4;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    margin: 0;
+    padding: 2rem;
+    box-sizing: border-box;
+  }
+
+  .card {
+    position: relative;
+    background: #ffffff;
+    border: 1px solid #e0dbd4;
+    border-radius: 12px;
+    padding: 2.5rem 2.5rem;
+    max-width: 560px;
+    width: 100%;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+  }
+
+  .card-loading {
+    position: absolute;
+    inset: 0;
+    background: #ffffff;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 15px;
+    color: #888;
+    z-index: 50;
+  }
+
+  .title-row {
+    position: relative;
+    display: flex;
+    align-items: center;
+    min-height: 22px;
+    margin: 0 0 1.25rem;
+  }
+  .title {
+    font-size: 10pt;
+    font-weight: bold;
+    color: #2c2c2c;
+    margin: 0;
+  }
+  #score {
+    position: absolute;
+    right: 0;
+    font-size: 10pt;
+    font-weight: normal;
+    color: #cc0000;
+  }
+
+  .question {
+    margin: 0 0 1.6rem;
+    padding-bottom: 1.4rem;
+    border-bottom: 1px solid #eee6d9;
+  }
+  .question:last-of-type { border-bottom: none; }
+
+  .qnum {
+    font-weight: bold;
+    color: #2c2c2c;
+    margin-right: 4px;
+  }
+  .qtext {
+    color: #2c2c2c;
+    line-height: 1.5;
+  }
+
+  .answer-line {
+    display: flex;
+    align-items: baseline;
+    gap: 4px;
+    margin-top: 0.6rem;
+  }
+
+  table.tb {
+    border-collapse: collapse;
+    width: 100%;
+    margin: 0.8rem 0;
+    font-size: 10pt;
+  }
+  table.tb td { padding: 2px 6px; vertical-align: baseline; }
+  table.tb td.acct { color: #2c2c2c; }
+  table.tb td.amt { text-align: right; white-space: nowrap; width: 90px; }
+  table.tb tr.total td { border-top: 1px solid #999; padding-top: 4px; font-weight: bold; }
+  table.tb .dollar { display: inline-block; width: 12px; }
+
+  table.ae4 {
+    border-collapse: collapse;
+    margin: 0.8rem 0;
+    font-size: 10pt;
+  }
+  table.ae4 td, table.ae4 th { padding: 2px 12px 2px 0; text-align: right; }
+  table.ae4 th { font-weight: bold; text-align: right; }
+  table.ae4 td.rowlabel, table.ae4 th.corner { text-align: left; padding-right: 20px; }
+
+  input.answer {
+    width: 76px;
+    text-align: right;
+    padding: 2px 6px;
+    font-size: 10pt;
+    font-family: Arial, sans-serif;
+    border: 1px solid #d8cf9a;
+    border-radius: 3px;
+    background: #ffffcc;
+    color: #2c2c2c;
+    outline: none;
+    box-sizing: border-box;
+  }
+  input.answer:focus { border-color: #b5a94a; }
+
+  .check {
+    width: 12px;
+    margin-left: 4px;
+    text-align: center;
+    color: #00AA00;
+    font-weight: bold;
+    display: inline-block;
+  }
+  .check.incorrect { color: #cc0000; }
+  .check.clickable { cursor: pointer; }
+
+  .footer-row {
+    position: relative;
+    min-height: 24px;
+    margin-top: 1.4rem;
+    text-align: center;
+  }
+  .bs-submit-btn {
+    background: none;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    padding: 2px 10px;
+    font-size: 9pt;
+    font-family: Arial, sans-serif;
+    line-height: 1.4;
+    color: #555;
+    cursor: pointer;
+  }
+  .bs-submit-btn:hover { background: #f2efe9; border-color: #aaa; }
+  #assignment-msg {
+    display: block;
+    margin-top: 0.5rem;
+    font-size: 10pt;
+    color: #00AA00;
+  }
+
+</style>
+</head>
+<body>
+  <div class="card">
+    <div class="card-loading" id="card-loading">Loading…</div>
+
+    <div class="title-row">
+      <p class="title">Accounting Equation</p>
+      <span id="score"></span>
+    </div>
+
+    <!-- Question 1 -->
+    <div class="question">
+      <span class="qtext" style="display:block;font-weight:bold;margin-bottom:6px;">Assets = Liabilities + Stockholders' equity</span>
+      <span class="qnum">1.</span>
+      <span class="qtext" id="q1-questiontext">If assets is $<span id="q1-given1">50,000</span> and liabilities is $<span id="q1-given2">30,000</span>, what is stockholders' equity?</span>
+      <div class="answer-line">
+        <span>$</span>
+        <input type="text" inputmode="numeric" class="answer" id="q1Answer" oninput="formatWithCommas(this)" onblur="checkAnswer('q1Answer')" />
+        <span class="check" id="check-q1Answer"></span>
+      </div>
+    </div>
+
+    <!-- Question 2 -->
+    <div class="question">
+      <span class="qnum">2.</span>
+      <span class="qtext">If liabilities decreased by $<span id="q2-liabDecrease">20,800</span> during a month and stockholders' equity increased by $<span id="q2-equityIncrease">33,500</span> during the same month, how much did assets change? (Enter a decrease as a negative number.)</span>
+      <div class="answer-line">
+        <span>$</span>
+        <input type="text" inputmode="numeric" class="answer" id="assetChange" oninput="formatWithCommas(this)" onblur="checkAnswer('assetChange')" />
+        <span class="check" id="check-assetChange"></span>
+      </div>
+    </div>
+
+    <!-- Trial balance (context for Question 3 below — no answer box of its own) -->
+    <div class="question">
+      <span class="qtext">The following is a company's adjusted trial balance for the end of the month.</span>
+      <table class="tb">
+        <tr><td></td><td class="amt">Debit</td><td class="amt">Credit</td></tr>
+        <tr><td class="acct">Cash</td><td class="amt" id="tb-cash">9,870</td><td class="amt"></td></tr>
+        <tr><td class="acct">Accounts Receivable</td><td class="amt" id="tb-ar">5,940</td><td class="amt"></td></tr>
+        <tr><td class="acct">Equipment</td><td class="amt" id="tb-equipment">12,920</td><td class="amt"></td></tr>
+        <tr><td class="acct">Accounts Payable</td><td class="amt"></td><td class="amt" id="tb-ap">2,300</td></tr>
+        <tr><td class="acct">Common Stock</td><td class="amt"></td><td class="amt" id="tb-commonstock">9,000</td></tr>
+        <tr><td class="acct">Retained Earnings</td><td class="amt"></td><td class="amt" id="tb-beginre">8,160</td></tr>
+        <tr><td class="acct">Cash Dividends</td><td class="amt" id="tb-dividends">1,200</td><td class="amt"></td></tr>
+        <tr><td class="acct">Fees Earned</td><td class="amt"></td><td class="amt" id="tb-feesearned">20,930</td></tr>
+        <tr><td class="acct">Salary Expense</td><td class="amt" id="tb-salaryexp">8,910</td><td class="amt"></td></tr>
+        <tr><td class="acct">Rent Expense</td><td class="amt" id="tb-rentexp">1,940</td><td class="amt"></td></tr>
+        <tr><td class="acct">Supplies Expense</td><td class="amt" id="tb-suppliesexp">1,280</td><td class="amt"></td></tr>
+        <tr><td class="acct">Miscellaneous Expense</td><td class="amt" id="tb-miscexp">970</td><td class="amt"></td></tr>
+        <tr class="total"><td class="acct">TOTAL</td><td class="amt" id="tb-total-debit">$40,390</td><td class="amt" id="tb-total-credit">$40,390</td></tr>
+      </table>
+    </div>
+
+    <!-- Question 3 -->
+    <div class="question">
+      <span class="qnum">3.</span>
+      <span class="qtext">What amount of retained earnings will appear on the balance sheet at the end of the month?</span>
+      <div class="answer-line">
+        <span>$</span>
+        <input type="text" inputmode="numeric" class="answer" id="endingRE" oninput="formatWithCommas(this)" onblur="checkAnswer('endingRE')" />
+        <span class="check" id="check-endingRE"></span>
+      </div>
+    </div>
+
+    <!-- Question 4 -->
+    <div class="question">
+      <span class="qnum">4.</span>
+      <span class="qtext">The total assets and the total liabilities of a business at the beginning and at the end of the year are listed below.</span>
+      <table class="ae4">
+        <tr><th class="corner"></th><th>Assets</th><th>Liabilities</th></tr>
+        <tr><td class="rowlabel">Beginning of the year</td><td id="q4-beginAssets">258,800</td><td id="q4-beginLiab">168,200</td></tr>
+        <tr><td class="rowlabel">End of the year</td><td id="q4-endAssets">310,600</td><td id="q4-endLiab">194,100</td></tr>
+      </table>
+      <span class="qtext">During the year, cash dividends of $<span id="q4-divPaid">35,400</span> were paid and additional common stock was issued in exchange for cash of $<span id="q4-stockIssued">27,600</span>.</span>
+      <div class="answer-line" style="margin-top:0.9rem;">
+        <span class="qtext" style="margin-right:4px;">The amount of net income for the year was $</span>
+        <input type="text" inputmode="numeric" class="answer" id="netIncome" oninput="formatWithCommas(this)" onblur="checkAnswer('netIncome')" />
+        <span class="check" id="check-netIncome"></span>
+      </div>
+    </div>
+
+    <div class="footer-row">
+      <button class="bs-submit-btn" id="submit-btn" onclick="submitAssignment()">Submit assignment</button>
+      <button class="bs-submit-btn" id="newversion-btn" onclick="newVersion()" style="display:none;">New version</button>
+      <span id="assignment-msg"></span>
+    </div>
+  </div>
+
+  <script>
+    // Same Apps Script Web App deployment as the Balance Sheet quizzes,
+    // using ae_-prefixed actions so they don't collide with those. The
+    // answer key is generated and kept server-side; the browser only ever
+    // gets back a correct/incorrect boolean per field as the student
+    // works, and a final score at submit — never the answer key itself.
+    var SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxyvIFZMccFKAn8urP7XQWY1jCJKDBjW2cQcg51RJVM7g1qy2RCDmnPrOm_nr0_tyfo/exec';
+
+    var answerIds = ['q1Answer', 'assetChange', 'endingRE', 'netIncome'];
+
+    function formatPlain(n) { return n.toLocaleString('en-US'); }
+
+    var currentToken, currentGiven, answeredCorrectly;
+
+    function callServer(payload) {
+      return fetch(SCRIPT_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify(payload)
+      }).then(function(res) { return res.json(); });
+    }
+
+    function init() {
+      answerIds.forEach(function(id) {
+        document.getElementById(id).disabled = false;
+        document.getElementById(id).value = '';
+        document.getElementById('check-' + id).textContent = '';
+      });
+      answeredCorrectly = {};
+      document.getElementById('assignment-msg').textContent = '';
+      document.getElementById('submit-btn').style.display = 'inline-block';
+      document.getElementById('newversion-btn').style.display = 'none';
+
+      var loadingOverlay = document.getElementById('card-loading');
+      loadingOverlay.textContent = 'Loading…';
+      loadingOverlay.style.display = 'flex';
+
+      callServer({ action: 'ae_generate' }).then(function(res) {
+        if (res.error) {
+          loadingOverlay.textContent = 'Could not load assignment. Please refresh.';
+          return;
+        }
+        currentToken = res.token;
+        applyInstance(res.instance);
+        loadingOverlay.style.display = 'none';
+      }).catch(function() {
+        loadingOverlay.textContent = 'Could not load assignment. Please refresh.';
+      });
+    }
+
+    // Sentence templates for Question 1, keyed by which of the three
+    // (assets/liabilities/equity) the server chose as the unknown.
+    var eqSentences = {
+      equity: function(a, b) { return "If assets is $" + a + " and liabilities is $" + b + ", what is stockholders' equity?"; },
+      liabilities: function(a, b) { return "If assets is $" + a + " and stockholders' equity is $" + b + ", what are the liabilities?"; },
+      assets: function(a, b) { return "If liabilities is $" + a + " and stockholders' equity is $" + b + ", what are the total assets?"; }
+    };
+
+    function applyInstance(given) {
+      currentGiven = given;
+
+      var unknown = given.eqUnknown;
+      var sentence;
+      if (unknown === 'equity') {
+        sentence = eqSentences.equity(formatPlain(given.eqAssets), formatPlain(given.eqLiabilities));
+      } else if (unknown === 'liabilities') {
+        sentence = eqSentences.liabilities(formatPlain(given.eqAssets), formatPlain(given.eqEquity));
+      } else {
+        sentence = eqSentences.assets(formatPlain(given.eqLiabilities), formatPlain(given.eqEquity));
+      }
+      document.getElementById('q1-questiontext').textContent = sentence;
+
+      document.getElementById('q2-liabDecrease').textContent = formatPlain(given.liabDecrease);
+      document.getElementById('q2-equityIncrease').textContent = formatPlain(given.equityIncrease);
+
+      document.getElementById('tb-cash').textContent = formatPlain(given.cash);
+      document.getElementById('tb-ar').textContent = formatPlain(given.ar);
+      document.getElementById('tb-equipment').textContent = formatPlain(given.equipment);
+      document.getElementById('tb-ap').textContent = formatPlain(given.accountsPayable);
+      document.getElementById('tb-commonstock').textContent = formatPlain(given.commonStock);
+      document.getElementById('tb-beginre').textContent = formatPlain(given.beginningRE);
+      document.getElementById('tb-dividends').textContent = formatPlain(given.dividends);
+      document.getElementById('tb-feesearned').textContent = formatPlain(given.feesEarned);
+      document.getElementById('tb-salaryexp').textContent = formatPlain(given.salaryExpense);
+      document.getElementById('tb-rentexp').textContent = formatPlain(given.rentExpense);
+      document.getElementById('tb-suppliesexp').textContent = formatPlain(given.suppliesExpense);
+      document.getElementById('tb-miscexp').textContent = formatPlain(given.miscExpense);
+      document.getElementById('tb-total-debit').textContent = '$' + formatPlain(given.total);
+      document.getElementById('tb-total-credit').textContent = '$' + formatPlain(given.total);
+
+      document.getElementById('q4-beginAssets').textContent = formatPlain(given.beginAssets);
+      document.getElementById('q4-beginLiab').textContent = formatPlain(given.beginLiab);
+      document.getElementById('q4-endAssets').textContent = formatPlain(given.endAssets);
+      document.getElementById('q4-endLiab').textContent = formatPlain(given.endLiab);
+      document.getElementById('q4-divPaid').textContent = formatPlain(given.divPaid);
+      document.getElementById('q4-stockIssued').textContent = formatPlain(given.stockIssuedCash);
+
+      updateScore();
+    }
+
+    function updateScore() {
+      var count = answerIds.filter(function(id) { return answeredCorrectly[id]; }).length;
+      var pct = Math.round((count / answerIds.length) * 100);
+      document.getElementById('score').textContent = 'Score ' + pct + '%';
+    }
+
+    function formatWithCommas(input) {
+      var neg = input.value.trim().charAt(0) === '-';
+      var digits = input.value.replace(/[^\d]/g, '');
+      if (digits === '') { input.value = neg ? '-' : ''; return; }
+      input.value = (neg ? '-' : '') + Number(digits).toLocaleString('en-US');
+    }
+
+    function parseVal(id) {
+      var raw = document.getElementById(id).value.trim();
+      var neg = raw.charAt(0) === '-';
+      var digits = raw.replace(/[^\d]/g, '');
+      return digits === '' ? '' : (neg ? '-' : '') + digits;
+    }
+
+    function checkAnswer(id) {
+      var checkSpan = document.getElementById('check-' + id);
+      var val = parseVal(id);
+      if (val === '') {
+        checkSpan.textContent = '';
+        answeredCorrectly[id] = false;
+        updateScore();
+        return;
+      }
+      callServer({ action: 'ae_check', token: currentToken, id: id, value: val }).then(function(res) {
+        if (res.error) {
+          checkSpan.textContent = '';
+          return;
+        }
+        checkSpan.textContent = res.correct ? '\u2713' : '';
+        answeredCorrectly[id] = res.correct;
+        updateScore();
+      }).catch(function() {
+        checkSpan.textContent = '';
+      });
+    }
+
+    function submitAssignment() {
+      var msg = document.getElementById('assignment-msg');
+      msg.textContent = 'Sending...';
+      msg.style.color = '#999';
+
+      document.getElementById('submit-btn').style.display = 'none';
+      document.getElementById('newversion-btn').style.display = 'inline-block';
+
+      var answers = {};
+      answerIds.forEach(function(id) { answers[id] = parseVal(id); });
+
+      callServer({ action: 'ae_submit', token: currentToken, answers: answers, given: currentGiven, name: 'Accounting Equation CheckMate' }).then(function(res) {
+        if (res.error) {
+          msg.textContent = 'Submission failed — your session may have expired. Please refresh and retry.';
+          msg.style.color = '#cc0000';
+          return;
+        }
+        document.getElementById('score').textContent = 'Score ' + res.score + '%';
+        if (res.logged) {
+          msg.textContent = 'Successfully submitted';
+          msg.style.color = '#00AA00';
+        } else {
+          msg.textContent = 'Submitted, but the score log may not have saved.';
+          msg.style.color = '#cc7a00';
+        }
+      }).catch(function() {
+        msg.textContent = 'Submission failed. Please try again.';
+        msg.style.color = '#cc0000';
+      });
+    }
+
+    function newVersion() {
+      document.getElementById('newversion-btn').style.display = 'none';
+      document.getElementById('submit-btn').style.display = 'inline-block';
+      init();
+    }
+
+    init();
+  </script>
+</body>
+</html>
