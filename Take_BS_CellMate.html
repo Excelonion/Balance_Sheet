@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Balance Sheet Quiz — Take Review</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    font-size: 10pt;
+    background: #f9f7f4;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    margin: 0;
+    padding: 2rem;
+    box-sizing: border-box;
+  }
+
+  .card {
+    position: relative;
+    background: #ffffff;
+    border: 1px solid #e0dbd4;
+    border-radius: 12px;
+    padding: 2.5rem 2.5rem;
+    max-width: 520px;
+    width: 100%;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+  }
+
+  .card-loading {
+    position: absolute;
+    inset: 0;
+    background: #ffffff;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 15px;
+    color: #888;
+    z-index: 50;
+  }
+
+  .title {
+    font-size: 10pt;
+    font-weight: bold;
+    color: #2c2c2c;
+    margin: 0 0 1rem;
+  }
+
+  .intro {
+    font-size: 10pt;
+    color: #2c2c2c;
+    margin: 0 0 1rem;
+  }
+
+  /* given-data box */
+  .givenbox { margin: 0 0 1.225rem; }
+  .givenbox .row {
+    display: flex;
+    align-items: baseline;
+    padding: 3px 14px;
+  }
+  .label {
+    flex: 1;
+    color: #2c2c2c;
+  }
+  .amt-detail, .amt-total {
+    width: 76px;
+    text-align: right;
+    white-space: nowrap;
+    position: relative;
+  }
+  .amt-detail { margin-right: 24px; }
+  .plain-num { padding-right: 8px; box-sizing: border-box; }
+  .dollar-sign { position: absolute; }
+
+  .check {
+    width: 12px;
+    margin-left: 4px;
+    text-align: center;
+    color: #00AA00;
+    font-weight: bold;
+  }
+  .check-abs {
+    position: absolute;
+    left: 100%;
+    top: 50%;
+    transform: translateY(-50%);
+    margin-left: 4px;
+  }
+
+  /* the framed statement: heading block + body, bordered on left/right/bottom;
+     the top edge of the frame is the stmt-header's own top border */
+  .statement-box {
+    border-left: 1px solid #999;
+    border-right: 1px solid #999;
+    border-bottom: 1px solid #999;
+  }
+
+  /* statement title block - the two horizontal lines above "Assets" */
+  .stmt-header {
+    text-align: center;
+    border-top: 1px solid #999;
+    border-bottom: 1px solid #999;
+    padding: 6px 14px;
+  }
+  .stmt-header div { padding: 1px 0; }
+
+  /* statement body - every row (including section headers) is the same height */
+  .statement-box .row,
+  .statement-box .section-header {
+    height: 22px;
+    box-sizing: border-box;
+    padding: 0 14px;
+    display: flex;
+    align-items: center;
+  }
+
+  .statement-box .row.spacer-15 { height: 15px; }
+  .statement-box .row.spacer-8 { height: 8px; }
+
+  .section-header {
+    font-weight: bold;
+    justify-content: center;
+    text-align: center;
+    margin-top: 7px;
+  }
+  .section-header.first { margin-top: 0; }
+
+  input.answer {
+    width: 64px;
+    text-align: right;
+    padding: 2px 6px;
+    font-size: 10pt;
+    font-family: Arial, sans-serif;
+    border: 1px solid #d8cf9a;
+    border-radius: 3px;
+    background: #ffffcc;
+    color: #2c2c2c;
+    outline: none;
+    box-sizing: border-box;
+  }
+  .title-row {
+    position: relative;
+    display: flex;
+    align-items: center;
+    min-height: 22px;
+    margin: 0 0 1rem;
+  }
+  .title { margin: 0; }
+  #score {
+    position: absolute;
+    right: 6ch;
+    font-size: 10pt;
+    font-weight: normal;
+    color: #cc0000;
+  }
+  .footer-row {
+    position: relative;
+    min-height: 24px;
+    margin-top: 0.8125rem;
+  }
+  .bs-submit-btn {
+    background: none;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    padding: 2px 10px;
+    font-size: 9pt;
+    font-family: Arial, sans-serif;
+    line-height: 1.4;
+    color: #555;
+    cursor: pointer;
+  }
+  .bs-submit-btn:hover { background: #f2efe9; border-color: #aaa; }
+  #submit-btn, #assignment-msg {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+  #assignment-msg {
+    font-size: 10pt;
+    color: #00AA00;
+  }
+  .check.incorrect { color: #cc0000; }
+  input.answer:focus { border-color: #b5a94a; }
+  input.answer:disabled {
+    background: #f4f4f0;
+    color: #2c2c2c;
+    -webkit-text-fill-color: #2c2c2c;
+    opacity: 1;
+  }
+  .check.clickable { cursor: pointer; }
+</style>
+</head>
+<body>
+  <div class="card">
+    <div class="card-loading" id="card-loading">Loading…</div>
+
+    <div class="title-row">
+      <p class="title">Balance Sheet</p>
+      <span id="score"></span>
+    </div>
+    <p class="intro"><span id="introCompany">Smith Consulting Business</span> reported the following for <span id="introMonth">July</span> <span id="introYear">2026</span>:</p>
+
+    <div class="givenbox" id="givenbox">
+      <div class="row" id="row-revenue">
+        <span class="label">Revenue</span>
+        <span class="amt-detail" id="wrap-revenue"><span class="dollar-sign" id="dollar-revenue"></span><span id="amt-revenue">39,680</span></span>
+        <span class="amt-total"></span>
+      </div>
+      <div class="row" id="row-expenses">
+        <span class="label">Expenses</span>
+        <span class="amt-detail" id="wrap-expenses"><span class="dollar-sign" id="dollar-expenses"></span><span id="amt-expenses">11,160</span></span>
+        <span class="amt-total"></span>
+      </div>
+      <div class="row" id="row-re">
+        <span class="label">Retained earnings balance on <span id="reMonth">July</span> 1, <span id="reYear">2026</span></span>
+        <span class="amt-detail" id="wrap-re"><span class="dollar-sign" id="dollar-re"></span><span id="amt-re">52,140</span></span>
+        <span class="amt-total"></span>
+      </div>
+      <div class="row" id="row-dividends">
+        <span class="label">Dividends declared and paid</span>
+        <span class="amt-detail" id="wrap-dividends"><span class="dollar-sign" id="dollar-dividends"></span><span id="amt-dividends">8,900</span></span>
+        <span class="amt-total"></span>
+      </div>
+    </div>
+
+    <div class="statement-box">
+      <div class="stmt-header">
+        <div><span id="stmtCompany">Smith Consulting Business</span></div>
+        <div>Balance Sheet</div>
+        <div><span id="stmtMonth">July</span> <span id="stmtDay">31</span>, <span id="stmtYear">2026</span></div>
+      </div>
+
+      <div class="row spacer-8">
+        <span class="label">&nbsp;</span>
+        <span class="amt-detail"></span>
+        <span class="amt-total"></span>
+        <span class="check"></span>
+      </div>
+
+      <div class="section-header first">Assets</div>
+
+      <div class="row">
+        <span class="label">Cash</span>
+        <span class="amt-detail" id="wrap-cash">
+          <span class="plain-num" id="given-cash" style="display:none;">$ 29,320</span>
+          <span id="input-cash" style="display:none;">$ <input type="text" inputmode="numeric" class="answer" id="cash" /><span class="check check-abs" id="check-cash"></span></span>
+        </span>
+        <span class="amt-total"></span>
+        <span class="check"></span>
+      </div>
+      <div class="row">
+        <span class="label">Accounts receivable</span>
+        <span class="amt-detail" id="wrap-ar">
+          <span class="plain-num" id="given-ar" style="display:none;">32,330</span>
+          <span id="input-ar" style="display:none;"><input type="text" inputmode="numeric" class="answer" id="ar" /><span class="check check-abs" id="check-ar"></span></span>
+        </span>
+        <span class="amt-total"></span>
+        <span class="check"></span>
+      </div>
+      <div class="row">
+        <span class="label">Equipment</span>
+        <span class="amt-detail" id="wrap-equipment">
+          <span class="plain-num" id="given-equipment" style="display:none;">94,790</span>
+          <span id="input-equipment" style="display:none;"><input type="text" inputmode="numeric" class="answer" id="equipment" /><span class="check check-abs" id="check-equipment"></span></span>
+        </span>
+        <span class="amt-total"></span>
+        <span class="check"></span>
+      </div>
+      <div class="row">
+        <span class="label">Total assets</span>
+        <span class="amt-detail"></span>
+        <span class="amt-total">$ <input type="text" inputmode="numeric" class="answer" id="totalAssets" /></span>
+        <span class="check" id="check-totalAssets"></span>
+      </div>
+
+      <div class="section-header first">Liabilities</div>
+
+      <div class="row">
+        <span class="label">Accounts payable</span>
+        <span class="amt-detail" id="wrap-ap">
+          <span class="plain-num" id="given-ap" style="display:none;">$ 28,680</span>
+          <span id="input-ap" style="display:none;">$ <input type="text" inputmode="numeric" class="answer" id="ap" /><span class="check check-abs" id="check-ap"></span></span>
+        </span>
+        <span class="amt-total"></span>
+        <span class="check"></span>
+      </div>
+
+      <div class="section-header">Stockholders' Equity</div>
+
+      <div class="row">
+        <span class="label">Common stock</span>
+        <span class="amt-detail plain-num" id="amt-commonstock">56,000</span>
+        <span class="amt-total"></span>
+        <span class="check"></span>
+      </div>
+      <div class="row">
+        <span class="label">Retained earnings</span>
+        <span class="amt-detail"><input type="text" inputmode="numeric" class="answer" id="retainedEarnings" /><span class="check check-abs" id="check-retainedEarnings"></span></span>
+        <span class="amt-total"></span>
+        <span class="check"></span>
+      </div>
+      <div class="row">
+        <span class="label">Total liabilities and stockholders' equity</span>
+        <span class="amt-detail"></span>
+        <span class="amt-total">$ <input type="text" inputmode="numeric" class="answer" id="totalLiabEquity" /></span>
+        <span class="check" id="check-totalLiabEquity"></span>
+      </div>
+      <div class="row spacer-15">
+        <span class="label">&nbsp;</span>
+        <span class="amt-detail"></span>
+        <span class="amt-total"></span>
+        <span class="check"></span>
+      </div>
+    </div>
+
+    <div class="footer-row">
+      <span style="font-size:9pt; color:#888;" id="take-label">Take</span>
+    </div>
+
+  </div>
+
+  <script>
+    // Separate deployment from the main quiz backend — this page only
+    // ever reads a logged submission back, it never generates or grades
+    // anything. See Take_BalanceSheet_CellMate_Server.gs.
+    var SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyLnMa8psrwqbCOPzQ9LUHpBnQVSeT_oKGZB9etXVElhuGg5jwrNgvHPMuyAE3bcrX6/exec';
+
+    function formatPlain(n) {
+      if (n === null || n === undefined || n === '') return '';
+      return Number(n).toLocaleString('en-US');
+    }
+
+    function callServer(payload) {
+      return fetch(SCRIPT_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify(payload)
+      }).then(function(res) { return res.json(); });
+    }
+
+    // Renders the given data exactly like the live quiz does — except the
+    // four given-data rows always render in their natural (unshuffled)
+    // order, since the original random order isn't logged.
+    function applyGiven(given) {
+      document.getElementById('introMonth').textContent = given.month;
+      document.getElementById('reMonth').textContent = given.month;
+      document.getElementById('stmtMonth').textContent = given.month;
+      document.getElementById('stmtDay').textContent = 31;
+
+      document.getElementById('introYear').textContent = given.year;
+      document.getElementById('reYear').textContent = given.year;
+      document.getElementById('stmtYear').textContent = given.year;
+
+      document.getElementById('introCompany').textContent = given.company;
+      document.getElementById('stmtCompany').textContent = given.company;
+
+      document.getElementById('amt-revenue').textContent = formatPlain(given.revenue);
+      document.getElementById('amt-expenses').textContent = formatPlain(given.expenses);
+      document.getElementById('amt-re').textContent = formatPlain(given.beginningRE);
+      document.getElementById('amt-dividends').textContent = formatPlain(given.dividends);
+      document.getElementById('amt-commonstock').textContent = formatPlain(given.commonStock);
+
+      // Dollar sign on the first given-data row (natural order: revenue).
+      var amountKeys = ['revenue', 'expenses', 're', 'dividends'];
+      var maxLen = 0;
+      amountKeys.forEach(function(key) {
+        var len = document.getElementById('amt-' + key).textContent.length;
+        if (len > maxLen) maxLen = len;
+      });
+      var dollarSpan = document.getElementById('dollar-revenue');
+      dollarSpan.textContent = '$';
+      dollarSpan.style.right = maxLen + 'ch';
+
+      var chosenTarget = given.chosenTarget;
+      ['cash', 'ar', 'equipment', 'ap'].forEach(function(key) {
+        var givenSpan = document.getElementById('given-' + key);
+        var inputSpan = document.getElementById('input-' + key);
+        if (key === chosenTarget) {
+          givenSpan.style.display = 'none';
+          inputSpan.style.display = 'inline';
+        } else {
+          givenSpan.style.display = 'inline';
+          inputSpan.style.display = 'none';
+          var prefix = (key === 'cash' || key === 'ap') ? '$ ' : '';
+          givenSpan.textContent = prefix + formatPlain(given[key]);
+        }
+      });
+    }
+
+    function applyEntered(entered, chosenTarget) {
+      var answerBoxIds = [chosenTarget, 'totalAssets', 'retainedEarnings', 'totalLiabEquity'];
+      answerBoxIds.forEach(function(id) {
+        var input = document.getElementById(id);
+        input.value = formatPlain(entered[id]);
+        input.disabled = true;
+      });
+    }
+
+    function init() {
+      var loadingOverlay = document.getElementById('card-loading');
+
+      var params = new URLSearchParams(window.location.search);
+      var student = params.get('student');
+      var take = params.get('take');
+
+      if (!student || !take) {
+        loadingOverlay.textContent = 'Please choose a name and take from the review page.';
+        loadingOverlay.style.display = 'flex';
+        return;
+      }
+
+      loadingOverlay.textContent = 'Loading…';
+      loadingOverlay.style.display = 'flex';
+
+      callServer({ action: 'fetch_take', student: student, take: take }).then(function(res) {
+        if (res.error) {
+          var msg = 'Could not load this submission. Please refresh.';
+          if (res.error === 'no_data') msg = 'No submissions found yet.';
+          if (res.error === 'not_found') msg = 'No submission found for that name and take.';
+          loadingOverlay.textContent = msg;
+          return;
+        }
+        applyGiven(res.given);
+        applyEntered(res.entered, res.given.chosenTarget);
+        document.getElementById('score').textContent = 'Score ' + res.score;
+        document.getElementById('take-label').textContent = 'Take ' + take;
+        loadingOverlay.style.display = 'none';
+      }).catch(function() {
+        loadingOverlay.textContent = 'Could not load this submission. Please refresh.';
+      });
+    }
+
+    init();
+  </script>
+</body>
+</html>
