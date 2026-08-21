@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Accounting Equation — Review a Take</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    font-size: 10pt;
+    background: #f9f7f4;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    margin: 0;
+    padding: 2rem;
+    box-sizing: border-box;
+  }
+  .card {
+    position: relative;
+    background: #ffffff;
+    border: 1px solid #e0dbd4;
+    border-radius: 12px;
+    padding: 2.5rem 2.5rem;
+    max-width: 400px;
+    width: 100%;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+    text-align: center;
+  }
+  .title {
+    font-size: 11pt;
+    font-weight: bold;
+    color: #2c2c2c;
+    margin: 0 0 1.4rem;
+  }
+  select {
+    width: 100%;
+    padding: 6px 8px;
+    font-size: 10pt;
+    font-family: Arial, sans-serif;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    background: #fff;
+    color: #2c2c2c;
+    box-sizing: border-box;
+    margin-bottom: 1.2rem;
+  }
+  select:disabled { background: #f4f4f0; color: #999; }
+  .view-btn {
+    background: #2c2c2c;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    padding: 8px 20px;
+    font-size: 10pt;
+    font-family: Arial, sans-serif;
+    cursor: pointer;
+  }
+  .view-btn:disabled { background: #ccc; cursor: not-allowed; }
+  .view-btn:not(:disabled):hover { background: #444; }
+  .status-msg {
+    font-size: 9pt;
+    color: #999;
+    margin-top: 1rem;
+  }
+  .status-msg.error { color: #cc0000; }
+</style>
+</head>
+<body>
+  <div class="card">
+    <p class="title">Review a Take — Accounting Equation</p>
+    <select id="student-select" disabled>
+      <option value="">Loading names…</option>
+    </select>
+    <br />
+    <select id="take-select" disabled>
+      <option value="">Select a name first…</option>
+    </select>
+    <br />
+    <button class="view-btn" id="view-btn" onclick="view()" disabled>View</button>
+    <div class="status-msg" id="status-msg"></div>
+  </div>
+
+  <script>
+    // The separate, read-only Take_CellMate backend — not the main quiz
+    // backend, since this page only ever reads logged submissions.
+    var SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxyvIFZMccFKAn8urP7XQWY1jCJKDBjW2cQcg51RJVM7g1qy2RCDmnPrOm_nr0_tyfo/exec';
+
+    // Where the replay page lives — update this to match wherever you
+    // host Take_CellMate.html (e.g. your GitHub Pages URL).
+    var TAKE_URL = 'https://excelonion.github.io/Balance_Sheet/Take_CellMate.html';
+
+    function callServer(payload) {
+      return fetch(SCRIPT_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify(payload)
+      }).then(function(res) { return res.json(); });
+    }
+
+    function init() {
+      callServer({ action: 'get_roster' }).then(function(res) {
+        var select = document.getElementById('student-select');
+        var statusMsg = document.getElementById('status-msg');
+        if (res.error || !res.names || res.names.length === 0) {
+          select.innerHTML = '<option value="">No names available</option>';
+          statusMsg.textContent = 'Could not load the roster. Please tell your instructor.';
+          statusMsg.classList.add('error');
+          return;
+        }
+        select.innerHTML = '<option value="">Select your name…</option>' +
+          res.names.map(function(n) { return '<option value="' + encodeURIComponent(n) + '">' + n + '</option>'; }).join('');
+        select.disabled = false;
+        select.onchange = onStudentChange;
+      }).catch(function() {
+        document.getElementById('status-msg').textContent = 'Could not load the roster. Please refresh.';
+        document.getElementById('status-msg').classList.add('error');
+      });
+    }
+
+    function onStudentChange() {
+      var studentSelect = document.getElementById('student-select');
+      var takeSelect = document.getElementById('take-select');
+      var viewBtn = document.getElementById('view-btn');
+
+      viewBtn.disabled = true;
+      takeSelect.disabled = true;
+      takeSelect.innerHTML = '<option value="">Loading takes…</option>';
+
+      if (!studentSelect.value) {
+        takeSelect.innerHTML = '<option value="">Select a name first…</option>';
+        return;
+      }
+
+      callServer({ action: 'get_takes', student: decodeURIComponent(studentSelect.value) }).then(function(res) {
+        if (!res.takes || res.takes.length === 0) {
+          takeSelect.innerHTML = '<option value="">No takes yet for this student</option>';
+          return;
+        }
+        takeSelect.innerHTML = '<option value="">Select a take…</option>' +
+          res.takes.map(function(t) { return '<option value="' + t + '">Take ' + t + '</option>'; }).join('');
+        takeSelect.disabled = false;
+        takeSelect.onchange = function() {
+          viewBtn.disabled = !takeSelect.value;
+        };
+      }).catch(function() {
+        takeSelect.innerHTML = '<option value="">Could not load takes</option>';
+      });
+    }
+
+    function view() {
+      var student = document.getElementById('student-select').value;
+      var take = document.getElementById('take-select').value;
+      if (!student || !take) return;
+      window.location.href = TAKE_URL + '?student=' + student + '&take=' + take;
+    }
+
+    init();
+  </script>
+</body>
+</html>
